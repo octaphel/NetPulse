@@ -22,7 +22,7 @@ NetPulse provides a live overview of network activity, active connections, traff
 
 
 
-![NetPulse Dashboard](assets/netpulse-dashboard.png)
+![NetPulse Dashboard](Assets/netpulse-dashboard.png)
 
 
 
