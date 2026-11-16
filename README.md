@@ -1,4 +1,4 @@
-\# NetPulse
+# NetPulse
 
 
 
@@ -14,83 +14,83 @@ NetPulse provides a live overview of network activity, active connections, traff
 
 
 
-\---
+---
 
 
 
-\## Screenshot
+## Screenshot
 
 
 
-!\[NetPulse Dashboard](Assets/netpulse-dashboard.png)
+![NetPulse Dashboard](assets/netpulse-dashboard.png)
 
 
 
-\---
+---
 
 
 
-\## Features
+## Features
 
 
 
-\### Traffic Monitoring
+### Traffic Monitoring
 
 
 
-\- Live inbound traffic monitoring
+- Live inbound traffic monitoring
 
-\- Live outbound traffic monitoring
+- Live outbound traffic monitoring
 
-\- Packets-per-second tracking
+- Packets-per-second tracking
 
-\- Historical traffic trend graphs
-
-
-
-\### Connection Monitoring
+- Historical traffic trend graphs
 
 
 
-\- Active TCP connection statistics
-
-\- UDP endpoint tracking
-
-\- Connection state monitoring
-
-\- Active flow overview
+### Connection Monitoring
 
 
 
-\### Host Resolution
+- Active TCP connection statistics
+
+- UDP endpoint tracking
+
+- Connection state monitoring
+
+- Active flow overview
 
 
 
-\- Reverse DNS lookups
-
-\- Cached hostname resolution
-
-\- Friendly service name mapping
-
-\- Basic destination identification
+### Host Resolution
 
 
 
-\### Dashboard Interface
+- Reverse DNS lookups
+
+- Cached hostname resolution
+
+- Friendly service name mapping
+
+- Basic destination identification
 
 
 
-\- Fixed terminal layout
-
-\- Live refresh updates
-
-\- Historical trend visualization
-
-\- Modular architecture for future expansion
+### Dashboard Interface
 
 
 
-\---
+- Fixed terminal layout
+
+- Live refresh updates
+
+- Historical trend visualization
+
+- Modular architecture for future expansion
+
+
+
+---
 
 
 
@@ -127,19 +127,19 @@ NetPulse
 ```
 
 
-\## Requirements
+## Requirements
 
 
 
-\- Windows PowerShell 5.1 or newer
+- Windows PowerShell 5.1 or newer
 
-\- Administrator privileges recommended
+- Administrator privileges recommended
 
-\- Windows networking cmdlets available
+- Windows networking cmdlets available
 
 
 
-\---
+---
 
 
 
@@ -164,7 +164,7 @@ Then run:
 ```
 
 
-\## Current Status
+## Current Status
 
 
 
@@ -172,15 +172,15 @@ The current prototype focuses on:
 
 
 
-\- Modular architecture
+- Modular architecture
 
-\- Real-time data collection
+- Real-time data collection
 
-\- Dashboard rendering
+- Dashboard rendering
 
-\- Hostname resolution
+- Hostname resolution
 
-\- Historical statistics
+- Historical statistics
 
 
 
@@ -188,25 +188,25 @@ Areas currently under development include:
 
 
 
-\- Dashboard layout refinement
+- Dashboard layout refinement
 
-\- Improved hostname identification
+- Improved hostname identification
 
-\- Better traffic attribution
+- Better traffic attribution
 
-\- Bandwidth-based top talkers
+- Bandwidth-based top talkers
 
-\- Enhanced protocol statistics
+- Enhanced protocol statistics
 
-\- Additional historical views
-
-
-
-\---
+- Additional historical views
 
 
 
-\## Roadmap
+---
+
+
+
+## Roadmap
 
 
 
@@ -214,27 +214,27 @@ Planned improvements:
 
 
 
-\- Better panel spacing and layout
+- Better panel spacing and layout
 
-\- Usage bars and visual indicators
+- Usage bars and visual indicators
 
-\- Improved DNS and service identification
+- Improved DNS and service identification
 
-\- Connection history tracking
+- Connection history tracking
 
-\- Interface selection
+- Interface selection
 
-\- Export and logging options
+- Export and logging options
 
-\- Alerting and anomaly detection
-
-
-
-\---
+- Alerting and anomaly detection
 
 
 
-\## License
+---
+
+
+
+## License
 
 
 
@@ -242,7 +242,7 @@ MIT License
 
 
 
-\---
+---
 
 
 
