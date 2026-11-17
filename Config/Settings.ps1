@@ -10,7 +10,7 @@ $Global:NetPulseSettings = @{
     # History
     ############################################################
 
-    HistoryLength = 10
+    HistoryLength = 8
 
     HistoryScale = @(
         '.'
@@ -29,11 +29,11 @@ $Global:NetPulseSettings = @{
     # Dashboard
     ############################################################
 
-    TopTalkerCount = 10
+    TopTalkerCount = 6
 
-    EventLogSize = 10
+    EventLogSize = 3
 
-    ActiveFlowRows = 12
+    ActiveFlowRows = 6
 
     MaxHostNameLength = 32
 
@@ -43,7 +43,7 @@ $Global:NetPulseSettings = @{
 
     EnableDNSResolution = $true
 
-    DNSCacheMinutes = 15
+    DNSCacheMinutes = 5
 
     UnknownHostLabel = "Unknown"
 
@@ -101,7 +101,7 @@ $Global:NetPulseSettings = @{
     # Usage Bars
     ############################################################
 
-    UsageBarWidth = 20
+    UsageBarWidth = 10
 
     UsageBarFilledChar = "|"
 
