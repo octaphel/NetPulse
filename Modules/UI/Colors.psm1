@@ -11,16 +11,17 @@ function Get-NetPulseColor {
 
     switch ($Name.ToUpper()) {
 
-        "HEADER"    { return $Script:NetPulseSettings.HeaderColor }
-        "SECTION"   { return $Script:NetPulseSettings.SectionColor }
-        "LABEL"     { return $Script:NetPulseSettings.LabelColor }
-        "VALUE"     { return $Script:NetPulseSettings.ValueColor }
-        "HOST"      { return $Script:NetPulseSettings.HostColor }
-        "EVENT"     { return $Script:NetPulseSettings.EventColor }
+        "HEADER"    { return $Global:NetPulseSettings.HeaderColor }
+        "SECTION"   { return $Global:NetPulseSettings.SectionColor }
+        "LABEL"     { return $Global:NetPulseSettings.LabelColor }
+        "VALUE"     { return $Global:NetPulseSettings.ValueColor }
+        "HOST"      { return $Global:NetPulseSettings.HostColor }
+        "EVENT"     { return $Global:NetPulseSettings.EventColor }
 
-        "HEALTHY"   { return $Script:NetPulseSettings.HealthyColor }
-        "WARNING"   { return $Script:NetPulseSettings.WarningColor }
-        "CRITICAL"  { return $Script:NetPulseSettings.CriticalColor }
+        "HEALTHY"   { return $Global:NetPulseSettings.HealthyColor }
+        "WARNING"   { return $Global:NetPulseSettings.WarningColor }
+                "CRITICAL"  { return $Global:NetPulseSettings.CriticalColor }
+        "UNKNOWN"   { return $Global:NetPulseSettings.UnknownColor }
 
         default     { return "White" }
     }
@@ -35,15 +36,15 @@ function Get-StatusColor {
     switch ($Status.ToUpper()) {
 
         "HEALTHY" {
-            return $Script:NetPulseSettings.HealthyColor
+            return $Global:NetPulseSettings.HealthyColor
         }
 
         "WARNING" {
-            return $Script:NetPulseSettings.WarningColor
+            return $Global:NetPulseSettings.WarningColor
         }
 
         "CRITICAL" {
-            return $Script:NetPulseSettings.CriticalColor
+            return $Global:NetPulseSettings.CriticalColor
         }
 
         default {

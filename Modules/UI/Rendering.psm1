@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # NetPulse - Rendering Module
 # ============================================================
 
@@ -32,16 +32,16 @@ function Show-NetPulseHeader {
         [object]$Data
     )
 
-    Write-Host "┌─────────────────────────────────────────────────────────────────────┐" -ForegroundColor DarkGray
+    Write-Host "+---------------------------------------------------------------------+" -ForegroundColor DarkGray
 
     $Header =
-        "│ NETPULSE  Status: {0,-8}  Refresh: {1}s │" -f `
+        "� NETPULSE  Status: {0,-8}  Refresh: {1}s �" -f `
         $Data.Status,
-        $Script:NetPulseSettings.RefreshInterval
+        $Global:NetPulseSettings.RefreshInterval
 
     Write-Host $Header -ForegroundColor Cyan
 
-    Write-Host "├──────────────────────┬──────────────────────┬───────────────────────┤" -ForegroundColor DarkGray
+    Write-Host "+---------------------------------------------------------------------�" -ForegroundColor DarkGray
 }
 
 # ============================================================
@@ -72,34 +72,34 @@ function Show-TrafficSection {
     }
 
     Write-Host (
-        "│ [ TRAFFIC ]          │ [ CONNECTIONS ]      │ [ EVENTS ]            │"
+        "� [ TRAFFIC ]          � [ CONNECTIONS ]      � [ EVENTS ]            �"
     )
 
     Write-Host (
-        "│ IN   {0,-14}│ ESTABLISHED {1,-8}│ {2,-21}│" -f
+        "� IN   {0,-14}� ESTABLISHED {1,-8}� {2,-21}�" -f
         $InValue,
         $Connections.Statistics.Established,
         $EventText
     )
 
     Write-Host (
-        "│ OUT  {0,-14}│ TIME_WAIT   {1,-8}│                       │" -f
+        "� OUT  {0,-14}� TIME_WAIT   {1,-8}�                       �" -f
         $OutValue,
         $Connections.Statistics.TimeWait
     )
 
     Write-Host (
-        "│ PKT/s {0,-12} │ SYN_SENT    {1,-8}│                       │" -f
+        "� PKT/s {0,-12} � SYN_SENT    {1,-8}�                       �" -f
         $PktValue,
         $Connections.Statistics.SynSent
     )
 
     Write-Host (
-        "│                      │ UDP        {0,-8}│                       │" -f
+        "�                      � UDP        {0,-8}�                       �" -f
         $Connections.Statistics.UDPEndpoints
     )
 
-    Write-Host "├──────────────────────┼──────────────────────┼───────────────────────┤" -ForegroundColor DarkGray
+    Write-Host "+----------------------+----------------------+-----------------------�" -ForegroundColor DarkGray
 }
 
 # ============================================================
@@ -112,20 +112,20 @@ function Show-HistorySection {
         [object]$Traffic
     )
 
-    Write-Host "│ [ INBOUND ]          │ [ OUTBOUND ]         │ [ PACKETS ]           │"
+    Write-Host "� [ INBOUND ]          � [ OUTBOUND ]         � [ PACKETS ]           �"
 
     Write-Host (
-        "│ {0,-20} │ {1,-20} │ {2,-20}│" -f
+        "� {0,-20} � {1,-20} � {2,-20}�" -f
         $Traffic.InboundHistory,
         $Traffic.OutboundHistory,
         $Traffic.PacketHistory
     )
 
     Write-Host (
-        "│                      │                      │                       │"
+        "�                      �                      �                       �"
     )
 
-    Write-Host "├──────────────────────┴──────────────────────┼───────────────────────┤" -ForegroundColor DarkGray
+    Write-Host "+---------------------------------------------+-----------------------�" -ForegroundColor DarkGray
 }
 
 # ============================================================
@@ -140,7 +140,7 @@ function Show-TopTalkersAndProtocols {
     )
 
     Write-Host (
-        "│ [ TOP TALKERS ]                             │ [ PROTOCOLS ]         │"
+        "� [ TOP TALKERS ]                             � [ PROTOCOLS ]         �"
     )
 
     $Rows = [Math]::Max(
@@ -193,13 +193,13 @@ function Show-TopTalkersAndProtocols {
         }
 
         Write-Host (
-            "│ {0,-42} │ {1,-21}│" -f
+            "� {0,-42} � {1,-21}�" -f
             $LeftText,
             $RightText
         )
     }
 
-    Write-Host "├─────────────────────────────────────────────┴───────────────────────┤" -ForegroundColor DarkGray
+    Write-Host "+---------------------------------------------------------------------�" -ForegroundColor DarkGray
 }
 
 # ============================================================
@@ -212,10 +212,10 @@ function Show-ActiveFlows {
         [object[]]$Flows
     )
 
-    Write-Host "│ [ ACTIVE FLOWS ]                                                    │"
+    Write-Host "� [ ACTIVE FLOWS ]                                                    �"
 
     $MaxRows =
-        $Script:NetPulseSettings.ActiveFlowRows
+        $Global:NetPulseSettings.ActiveFlowRows
 
     for ($i = 0; $i -lt $MaxRows; $i++) {
 
@@ -236,19 +236,19 @@ function Show-ActiveFlows {
             )
 
             Write-Host (
-                "│ {0,-66} │" -f
+                "� {0,-66} �" -f
                 $Text
             )
         }
         else {
 
             Write-Host (
-                "│                                                                  │"
+                "�                                                                  �"
             )
         }
     }
 
-    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor DarkGray
+    Write-Host "+---------------------------------------------------------------------+" -ForegroundColor DarkGray
 }
 
 # ============================================================
@@ -261,6 +261,10 @@ function Show-NetPulseFooter {
 
     Write-Host (
         "History Scale: Low ..__--==++**##@@ High"
+    ) -ForegroundColor DarkGray
+
+    Write-Host (
+        "Press CTRL+C to exit"
     ) -ForegroundColor DarkGray
 }
 

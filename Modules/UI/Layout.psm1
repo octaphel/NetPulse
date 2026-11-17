@@ -17,7 +17,7 @@ function Get-NetPulseLayout {
         TalkerHeight = 6
 
         ActiveFlowHeight =
-            $Script:NetPulseSettings.ActiveFlowRows
+            $Global:NetPulseSettings.ActiveFlowRows
 
         FooterHeight = 2
     }
