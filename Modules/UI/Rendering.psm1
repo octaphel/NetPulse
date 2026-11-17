@@ -1,309 +1,288 @@
 # ============================================================
 # NetPulse - Rendering Module
+# Canvas-Based Fixed Layout Renderer
+# PowerShell 5.1 Compatible
 # ============================================================
 
-# ============================================================
-# Helpers
-# ============================================================
-
-function Format-Value {
-
+function New-Canvas {
     param(
-        $Value,
-        [int]$Width = 0
+        [int]$Width,
+        [int]$Height
     )
 
-    $Text = "$Value"
+    $Canvas = @()
 
-    if ($Width -gt 0) {
-        return $Text.PadRight($Width)
+    for ($Y = 0; $Y -lt $Height; $Y++) {
+        $Canvas += ,([char[]](' ' * $Width))
     }
 
-    return $Text
+    return $Canvas
 }
 
-# ============================================================
-# Draw Header
-# ============================================================
-
-function Show-NetPulseHeader {
-
+function Set-CanvasText {
     param(
-        [object]$Data
+        [object]$Canvas,
+        [int]$X,
+        [int]$Y,
+        [string]$Text,
+        [int]$MaxWidth
     )
 
-    Write-Host "+---------------------------------------------------------------------+" -ForegroundColor DarkGray
-
-    $Header =
-        "¦ NETPULSE  Status: {0,-8}  Refresh: {1}s ¦" -f `
-        $Data.Status,
-        $Global:NetPulseSettings.RefreshInterval
-
-    Write-Host $Header -ForegroundColor Cyan
-
-    Write-Host "+---------------------------------------------------------------------¦" -ForegroundColor DarkGray
-}
-
-# ============================================================
-# Traffic Section
-# ============================================================
-
-function Show-TrafficSection {
-
-    param(
-        [object]$Traffic,
-        [object]$Connections,
-        [object[]]$Events
-    )
-
-    $InValue =
-        ("{0:N2} MB/s" -f $Traffic.Current.InboundMBps)
-
-    $OutValue =
-        ("{0:N2} MB/s" -f $Traffic.Current.OutboundMBps)
-
-    $PktValue =
-        $Traffic.Current.PacketsPerSecond
-
-    $EventText = ""
-
-    if ($Events.Count -gt 0) {
-        $EventText = $Events[0].Message
+    if ($Y -lt 0 -or $Y -ge $Canvas.Count) {
+        return
     }
 
-    Write-Host (
-        "¦ [ TRAFFIC ]          ¦ [ CONNECTIONS ]      ¦ [ EVENTS ]            ¦"
-    )
-
-    Write-Host (
-        "¦ IN   {0,-14}¦ ESTABLISHED {1,-8}¦ {2,-21}¦" -f
-        $InValue,
-        $Connections.Statistics.Established,
-        $EventText
-    )
-
-    Write-Host (
-        "¦ OUT  {0,-14}¦ TIME_WAIT   {1,-8}¦                       ¦" -f
-        $OutValue,
-        $Connections.Statistics.TimeWait
-    )
-
-    Write-Host (
-        "¦ PKT/s {0,-12} ¦ SYN_SENT    {1,-8}¦                       ¦" -f
-        $PktValue,
-        $Connections.Statistics.SynSent
-    )
-
-    Write-Host (
-        "¦                      ¦ UDP        {0,-8}¦                       ¦" -f
-        $Connections.Statistics.UDPEndpoints
-    )
-
-    Write-Host "+----------------------+----------------------+-----------------------¦" -ForegroundColor DarkGray
-}
-
-# ============================================================
-# History Section
-# ============================================================
-
-function Show-HistorySection {
-
-    param(
-        [object]$Traffic
-    )
-
-    Write-Host "¦ [ INBOUND ]          ¦ [ OUTBOUND ]         ¦ [ PACKETS ]           ¦"
-
-    Write-Host (
-        "¦ {0,-20} ¦ {1,-20} ¦ {2,-20}¦" -f
-        $Traffic.InboundHistory,
-        $Traffic.OutboundHistory,
-        $Traffic.PacketHistory
-    )
-
-    Write-Host (
-        "¦                      ¦                      ¦                       ¦"
-    )
-
-    Write-Host "+---------------------------------------------+-----------------------¦" -ForegroundColor DarkGray
-}
-
-# ============================================================
-# Top Talkers + Protocols
-# ============================================================
-
-function Show-TopTalkersAndProtocols {
-
-    param(
-        [object]$Talkers,
-        [object]$Protocols
-    )
-
-    Write-Host (
-        "¦ [ TOP TALKERS ]                             ¦ [ PROTOCOLS ]         ¦"
-    )
-
-    $Rows = [Math]::Max(
-        $Talkers.Talkers.Count,
-        3
-    )
-
-    for ($i = 0; $i -lt $Rows; $i++) {
-
-        $LeftText = ""
-
-        if ($i -lt $Talkers.Talkers.Count) {
-
-            $Entry = $Talkers.Talkers[$i]
-
-            $LeftText = (
-                "{0,-20} {1} {2,4}" -f
-                $Entry.Name,
-                $Entry.Trend,
-                $Entry.Connections
-            )
-        }
-
-        switch ($i) {
-
-            0 {
-                $RightText =
-                    ("TCP  {0} {1,5}%" -f
-                    $Protocols.TCP.UsageBar,
-                    $Protocols.TCP.Percentage)
-            }
-
-            1 {
-                $RightText =
-                    ("UDP  {0} {1,5}%" -f
-                    $Protocols.UDP.UsageBar,
-                    $Protocols.UDP.Percentage)
-            }
-
-            2 {
-                $RightText =
-                    ("ICMP {0} {1,5}%" -f
-                    $Protocols.ICMP.UsageBar,
-                    $Protocols.ICMP.Percentage)
-            }
-
-            default {
-                $RightText = ""
-            }
-        }
-
-        Write-Host (
-            "¦ {0,-42} ¦ {1,-21}¦" -f
-            $LeftText,
-            $RightText
-        )
+    if ($MaxWidth -lt 1) {
+        return
     }
 
-    Write-Host "+---------------------------------------------------------------------¦" -ForegroundColor DarkGray
-}
-
-# ============================================================
-# Active Flows
-# ============================================================
-
-function Show-ActiveFlows {
-
-    param(
-        [object[]]$Flows
-    )
-
-    Write-Host "¦ [ ACTIVE FLOWS ]                                                    ¦"
-
-    $MaxRows =
-        $Global:NetPulseSettings.ActiveFlowRows
-
-    for ($i = 0; $i -lt $MaxRows; $i++) {
-
-        if ($i -lt $Flows.Count) {
-
-            $Flow = $Flows[$i]
-
-            $Name = $Flow.ServiceName
-
-            if ([string]::IsNullOrWhiteSpace($Name)) {
-                $Name = $Flow.RemoteAddress
-            }
-
-            $Text = (
-                "{0}: {1}" -f
-                $Name,
-                $Flow.RemotePort
-            )
-
-            Write-Host (
-                "¦ {0,-66} ¦" -f
-                $Text
-            )
-        }
-        else {
-
-            Write-Host (
-                "¦                                                                  ¦"
-            )
-        }
+    if ($null -eq $Text) {
+        $Text = ""
     }
 
-    Write-Host "+---------------------------------------------------------------------+" -ForegroundColor DarkGray
+    if ($Text.Length -gt $MaxWidth) {
+        $Text = $Text.Substring(0, $MaxWidth)
+    }
+
+    $Text = $Text.PadRight($MaxWidth)
+
+    for ($I = 0; $I -lt $Text.Length; $I++) {
+
+        $Pos = $X + $I
+
+        if (
+            $Pos -ge 0 -and
+            $Pos -lt $Canvas[$Y].Length
+        ) {
+            $Canvas[$Y][$Pos] = $Text[$I]
+        }
+    }
 }
 
-# ============================================================
-# Footer
-# ============================================================
+function Draw-Panel {
+    param(
+        [object]$Canvas,
+        [object]$Panel,
+        [string]$Title
+    )
 
-function Show-NetPulseFooter {
+    $Left   = $Panel.X
+    $Top    = $Panel.Y
+    $Width  = $Panel.Width
+    $Height = $Panel.Height
 
-    Write-Host ""
+    $Right  = $Left + $Width - 1
+    $Bottom = $Top + $Height - 1
 
-    Write-Host (
-        "History Scale: Low ..__--==++**##@@ High"
-    ) -ForegroundColor DarkGray
+    $Canvas[$Top][$Left] = '+'
+    $Canvas[$Top][$Right] = '+'
+    $Canvas[$Bottom][$Left] = '+'
+    $Canvas[$Bottom][$Right] = '+'
 
-    Write-Host (
-        "Press CTRL+C to exit"
-    ) -ForegroundColor DarkGray
+    for ($X = $Left + 1; $X -lt $Right; $X++) {
+        $Canvas[$Top][$X] = '-'
+        $Canvas[$Bottom][$X] = '-'
+    }
+
+    for ($Y = $Top + 1; $Y -lt $Bottom; $Y++) {
+        $Canvas[$Y][$Left] = '|'
+        $Canvas[$Y][$Right] = '|'
+    }
+
+    if ($Title) {
+        $TitleText = "[ $Title ]"
+
+        $Available = $Width - 4
+
+        if ($TitleText.Length -gt $Available) {
+            $TitleText = $TitleText.Substring(0, $Available)
+        }
+
+        Set-CanvasText `
+            -Canvas $Canvas `
+            -X ($Left + 2) `
+            -Y $Top `
+            -Text $TitleText `
+            -MaxWidth $Available
+    }
 }
 
-# ============================================================
-# Main Renderer
-# ============================================================
+function Write-PanelLines {
+    param(
+        [object]$Canvas,
+        [object]$Panel,
+        [string[]]$Lines
+    )
+
+    $InnerWidth  = $Panel.Width - 2
+    $InnerHeight = $Panel.Height - 2
+
+    for ($Row = 0; $Row -lt $InnerHeight; $Row++) {
+
+        $Text = ""
+
+        if ($Row -lt $Lines.Count) {
+            $Text = "$($Lines[$Row])"
+        }
+
+        Set-CanvasText `
+            -Canvas $Canvas `
+            -X ($Panel.X + 1) `
+            -Y ($Panel.Y + 1 + $Row) `
+            -Text $Text `
+            -MaxWidth $InnerWidth
+    }
+}
+
+function Convert-CanvasToLines {
+    param(
+        [object]$Canvas
+    )
+
+    foreach ($Row in $Canvas) {
+        -join $Row
+    }
+}
 
 function Show-NetPulseDashboard {
-
     param(
         [Parameter(Mandatory)]
         [object]$Data
     )
 
+    $Layout = Get-NetPulseLayout
+
+    $Canvas = New-Canvas `
+        -Width $Layout.Canvas.Width `
+        -Height $Layout.Canvas.Height
+
+    Draw-Panel $Canvas $Layout.Header      "NETPULSE"
+    Draw-Panel $Canvas $Layout.Traffic     "TRAFFIC"
+    Draw-Panel $Canvas $Layout.Connections "CONNECTIONS"
+    Draw-Panel $Canvas $Layout.Events      "EVENTS"
+    Draw-Panel $Canvas $Layout.History     "HISTORY"
+    Draw-Panel $Canvas $Layout.TopTalkers  "TOP TALKERS"
+    Draw-Panel $Canvas $Layout.Protocols   "PROTOCOLS"
+    Draw-Panel $Canvas $Layout.ActiveFlows "ACTIVE FLOWS"
+    Draw-Panel $Canvas $Layout.Footer      "INFO"
+
+    # Header
+
+    $HeaderLines = @(
+        ("Status: {0}" -f $Data.Status)
+        ("Refresh: {0}s" -f $Global:NetPulseSettings.RefreshInterval)
+    )
+
+    Write-PanelLines $Canvas $Layout.Header $HeaderLines
+
+    # Traffic
+
+    $TrafficLines = @(
+        ("Inbound  : {0:N2} MB/s" -f $Data.Traffic.Current.InboundMBps)
+        ("Outbound : {0:N2} MB/s" -f $Data.Traffic.Current.OutboundMBps)
+        ("Packets  : {0}" -f $Data.Traffic.Current.PacketsPerSecond)
+        ("NICs     : {0}" -f $Data.Traffic.Current.InterfaceCount)
+    )
+
+    Write-PanelLines $Canvas $Layout.Traffic $TrafficLines
+
+    # Connections
+
+    $ConnLines = @(
+        ("TCP      : {0}" -f $Data.Connections.Statistics.TCPConnections)
+        ("UDP      : {0}" -f $Data.Connections.Statistics.UDPEndpoints)
+        ("ESTAB    : {0}" -f $Data.Connections.Statistics.Established)
+        ("LISTEN   : {0}" -f $Data.Connections.Statistics.Listen)
+        ("SYN_SENT : {0}" -f $Data.Connections.Statistics.SynSent)
+        ("TIMEWAIT : {0}" -f $Data.Connections.Statistics.TimeWait)
+    )
+
+    Write-PanelLines $Canvas $Layout.Connections $ConnLines
+
+    # Events
+
+    $EventLines = @()
+
+    foreach ($Event in $Data.Events) {
+        $EventLines += $Event.Message
+    }
+
+    Write-PanelLines $Canvas $Layout.Events $EventLines
+
+    # History
+
+    $HistoryLines = @(
+        ("Inbound : {0}" -f $Data.Traffic.InboundHistory)
+        ("Outbound: {0}" -f $Data.Traffic.OutboundHistory)
+        ("Packets : {0}" -f $Data.Traffic.PacketHistory)
+    )
+
+    Write-PanelLines $Canvas $Layout.History $HistoryLines
+
+    # Top Talkers
+
+    $TalkerLines = @()
+
+    foreach ($Talker in $Data.TopTalkers.Talkers) {
+
+        $TalkerLines += (
+            "{0} {1} {2}" -f
+            $Talker.Name,
+            $Talker.Trend,
+            $Talker.Connections
+        )
+    }
+
+    Write-PanelLines $Canvas $Layout.TopTalkers $TalkerLines
+
+    # Protocols
+
+    $ProtocolLines = @(
+        ("TCP  {0} {1}%" -f $Data.Protocols.TCP.UsageBar,$Data.Protocols.TCP.Percentage)
+        ("UDP  {0} {1}%" -f $Data.Protocols.UDP.UsageBar,$Data.Protocols.UDP.Percentage)
+        ("ICMP {0} {1}%" -f $Data.Protocols.ICMP.UsageBar,$Data.Protocols.ICMP.Percentage)
+        ""
+        ("TCP Count  : {0}" -f $Data.Protocols.TCP.Count)
+        ("UDP Count  : {0}" -f $Data.Protocols.UDP.Count)
+        ("ICMP Count : {0}" -f $Data.Protocols.ICMP.Count)
+    )
+
+    Write-PanelLines $Canvas $Layout.Protocols $ProtocolLines
+
+    # Active Flows
+
+    $FlowLines = @()
+
+    foreach ($Flow in $Data.Connections.ActiveFlows) {
+
+        $Name = $Flow.ServiceName
+
+        if ([string]::IsNullOrWhiteSpace($Name)) {
+            $Name = $Flow.RemoteAddress
+        }
+
+        $FlowLines += (
+            "{0}:{1}" -f
+            $Name,
+            $Flow.RemotePort
+        )
+    }
+
+    Write-PanelLines $Canvas $Layout.ActiveFlows $FlowLines
+
+    # Footer
+
+    $FooterLines = @(
+        $Global:NetPulseSettings.HistoryLegend
+    )
+
+    Write-PanelLines $Canvas $Layout.Footer $FooterLines
+
     Clear-Host
 
-    Show-NetPulseHeader $Data
-
-    Show-TrafficSection `
-        -Traffic $Data.Traffic `
-        -Connections $Data.Connections `
-        -Events $Data.Events
-
-    Show-HistorySection `
-        -Traffic $Data.Traffic
-
-    Show-TopTalkersAndProtocols `
-        -Talkers $Data.TopTalkers `
-        -Protocols $Data.Protocols
-
-    Show-ActiveFlows `
-        -Flows $Data.Connections.ActiveFlows
-
-    Show-NetPulseFooter
+    foreach ($Line in (Convert-CanvasToLines $Canvas)) {
+        Write-Host $Line
+    }
 }
 
-# ============================================================
-# Export
-# ============================================================
-
-Export-ModuleMember -Function `
-    Show-NetPulseDashboard
+Export-ModuleMember -Function Show-NetPulseDashboard
