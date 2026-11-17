@@ -4,44 +4,35 @@
 
 function Get-NetPulseEvents {
 
+    param(
+        [object]$Traffic,
+        [object]$Connections
+    )
+
     $Events = @()
 
-    try {
+    if ($Traffic.Current.InboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps) {
 
-        $Traffic = Get-TrafficSummary
-
-        if ($Traffic.Current.InboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps) {
-
-            $Events += [PSCustomObject]@{
-                Time    = Get-Date
-                Message = "High inbound traffic detected"
-            }
-        }
-
-        if ($Traffic.Current.OutboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps) {
-
-            $Events += [PSCustomObject]@{
-                Time    = Get-Date
-                Message = "High outbound traffic detected"
-            }
+        $Events += [PSCustomObject]@{
+            Time    = Get-Date
+            Message = "High inbound traffic detected"
         }
     }
-    catch {
-    }
 
-    try {
+    if ($Traffic.Current.OutboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps) {
 
-        $Connections = Get-ConnectionsSnapshot
-
-        if ($Connections.Statistics.Established -gt $Global:NetPulseSettings.HighConnectionCount) {
-
-            $Events += [PSCustomObject]@{
-                Time    = Get-Date
-                Message = "High connection count detected"
-            }
+        $Events += [PSCustomObject]@{
+            Time    = Get-Date
+            Message = "High outbound traffic detected"
         }
     }
-    catch {
+
+    if ($Connections.Statistics.Established -gt $Global:NetPulseSettings.HighConnectionCount) {
+
+        $Events += [PSCustomObject]@{
+            Time    = Get-Date
+            Message = "High connection count detected"
+        }
     }
 
     if ($Events.Count -eq 0) {
@@ -63,29 +54,27 @@ function Get-NetPulseEvents {
 
 function Get-NetPulseStatus {
 
-    try {
+    param(
+        [object]$Traffic,
+        [object]$Connections
+    )
 
-        $Traffic = Get-TrafficSummary
-
-        if (
-            $Traffic.Current.InboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps -or
-            $Traffic.Current.OutboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps
-        ) {
-
-            return "WARNING"
-        }
-
-        $Connections = Get-ConnectionsSnapshot
-
-        if (
-            $Connections.Statistics.Established -gt
-            $Global:NetPulseSettings.HighConnectionCount
-        ) {
-
-            return "WARNING"
-        }
+    if (-not $Traffic -or -not $Connections) {
+        return "UNKNOWN"
     }
-    catch {
+
+    if (
+        $Traffic.Current.InboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps -or
+        $Traffic.Current.OutboundMBps -gt $Global:NetPulseSettings.HighTrafficMBps
+    ) {
+        return "WARNING"
+    }
+
+    if (
+        $Connections.Statistics.Established -gt
+        $Global:NetPulseSettings.HighConnectionCount
+    ) {
+        return "WARNING"
     }
 
     return "HEALTHY"
@@ -93,17 +82,34 @@ function Get-NetPulseStatus {
 
 function Get-NetPulseData {
 
+    #
+    # Collect once
+    #
+
     $Traffic      = Get-TrafficSummary
     $Connections  = Get-ConnectionsSnapshot
     $Protocols    = Get-ProtocolSummary
     $TopTalkers   = Get-TopTalkersSummary
     $ResolverInfo = Get-ResolverStatistics
-    $Events       = Get-NetPulseEvents
-    $Status       = Get-NetPulseStatus
+
+    #
+    # Reuse everywhere
+    #
+
+    $Events = Get-NetPulseEvents `
+        -Traffic $Traffic `
+        -Connections $Connections
+
+    $Status = Get-NetPulseStatus `
+        -Traffic $Traffic `
+        -Connections $Connections
 
     [PSCustomObject]@{
+
         Timestamp   = Get-Date
+
         Status      = $Status
+
         Traffic     = $Traffic
         Connections = $Connections
         Protocols   = $Protocols

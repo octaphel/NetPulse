@@ -81,7 +81,7 @@ function Test-PrivateIPAddress {
 
 function Clear-ExpiredDNSCache {
 
-    $CacheMinutes = $Script:NetPulseSettings.DNSCacheMinutes
+    $CacheMinutes = $Global:NetPulseSettings.DNSCacheMinutes
 
     $Now = Get-Date
 
@@ -106,12 +106,12 @@ function Resolve-HostName {
         [string]$IPAddress
     )
 
-    if (-not $Script:NetPulseSettings.EnableDNSResolution) {
+    if (-not $Global:NetPulseSettings.EnableDNSResolution) {
         return $IPAddress
     }
 
     if ([string]::IsNullOrWhiteSpace($IPAddress)) {
-        return $Script:NetPulseSettings.UnknownHostLabel
+        return $Global:NetPulseSettings.UnknownHostLabel
     }
 
     Clear-ExpiredDNSCache
@@ -122,7 +122,7 @@ function Resolve-HostName {
     }
 
     if (
-        (-not $Script:NetPulseSettings.ResolvePrivateAddresses) -and
+        (-not $Global:NetPulseSettings.ResolvePrivateAddresses) -and
         (Test-PrivateIPAddress $IPAddress)
     ) {
 
