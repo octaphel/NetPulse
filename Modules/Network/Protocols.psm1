@@ -13,7 +13,7 @@ function New-UsageBar {
         [double]$Percentage
     )
 
-    $Width = $Script:NetPulseSettings.UsageBarWidth
+    $Width = $Global:NetPulseSettings.UsageBarWidth
 
     $Filled =
         [Math]::Round(
@@ -32,8 +32,8 @@ function New-UsageBar {
 
     $Bar =
         "[" +
-        ($Script:NetPulseSettings.UsageBarFilledChar * $Filled) +
-        ($Script:NetPulseSettings.UsageBarEmptyChar * $Empty) +
+        ($Global:NetPulseSettings.UsageBarFilledChar * $Filled) +
+        ($Global:NetPulseSettings.UsageBarEmptyChar * $Empty) +
         "]"
 
     return $Bar
@@ -50,7 +50,7 @@ function Get-ProtocolCounts {
 
     try {
 
-        if ($Script:NetPulseSettings.TrackTCP) {
+        if ($Global:NetPulseSettings.TrackTCP) {
 
             $TCPCount =
                 (Get-NetTCPConnection).Count
@@ -62,7 +62,7 @@ function Get-ProtocolCounts {
 
     try {
 
-        if ($Script:NetPulseSettings.TrackUDP) {
+        if ($Global:NetPulseSettings.TrackUDP) {
 
             $UDPCount =
                 (Get-NetUDPEndpoint).Count

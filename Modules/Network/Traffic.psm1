@@ -66,17 +66,17 @@ function Get-TrafficSnapshot {
     if (-not $Script:PreviousTrafficSample) {
 
         $Script:PreviousTrafficSample = @{
-            Timestamp = $CurrentTime
+            Timestamp  = $CurrentTime
             Statistics = $CurrentStats
         }
 
         return [PSCustomObject]@{
 
-            InboundMBps  = 0
-            OutboundMBps = 0
+            InboundMBps     = 0
+            OutboundMBps    = 0
 
-            InboundBytes  = 0
-            OutboundBytes = 0
+            InboundBytes    = 0
+            OutboundBytes   = 0
 
             PacketsPerSecond = 0
 
@@ -109,15 +109,34 @@ function Get-TrafficSnapshot {
             continue
         }
 
-        $InboundBytes +=
+        #
+        # Handle adapter counter resets
+        #
+
+        $InboundDelta =
             ($Current.ReceivedBytes -
              $Previous.ReceivedBytes)
 
-        $OutboundBytes +=
+        $OutboundDelta =
             ($Current.SentBytes -
              $Previous.SentBytes)
 
-        $Packets +=
+        if ($InboundDelta -lt 0) {
+            $InboundDelta = 0
+        }
+
+        if ($OutboundDelta -lt 0) {
+            $OutboundDelta = 0
+        }
+
+        $InboundBytes += $InboundDelta
+        $OutboundBytes += $OutboundDelta
+
+        #
+        # Handle packet counter resets
+        #
+
+        $PacketDelta =
             (
                 ($Current.ReceivedPackets -
                  $Previous.ReceivedPackets) +
@@ -125,6 +144,12 @@ function Get-TrafficSnapshot {
                 ($Current.SentPackets -
                  $Previous.SentPackets)
             )
+
+        if ($PacketDelta -lt 0) {
+            $PacketDelta = 0
+        }
+
+        $Packets += $PacketDelta
     }
 
     $InboundMBps =
@@ -134,26 +159,26 @@ function Get-TrafficSnapshot {
         ($OutboundBytes / 1MB) / $ElapsedSeconds
 
     $PacketsPerSecond =
-        [math]::Round(
+        [Math]::Round(
             ($Packets / $ElapsedSeconds),
             0
         )
 
     $Script:PreviousTrafficSample = @{
-        Timestamp = $CurrentTime
+        Timestamp  = $CurrentTime
         Statistics = $CurrentStats
     }
 
     return [PSCustomObject]@{
 
-        InboundBytes = $InboundBytes
+        InboundBytes  = $InboundBytes
         OutboundBytes = $OutboundBytes
 
         InboundMBps =
-            [math]::Round($InboundMBps, 2)
+            [Math]::Round($InboundMBps, 2)
 
         OutboundMBps =
-            [math]::Round($OutboundMBps, 2)
+            [Math]::Round($OutboundMBps, 2)
 
         PacketsPerSecond =
             $PacketsPerSecond
@@ -173,6 +198,7 @@ function Get-TrafficSnapshot {
 function Update-TrafficHistory {
 
     param (
+
         [Parameter(Mandatory)]
         [object]$TrafficData
     )
